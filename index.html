@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>InDi Daily Walkthrough</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -194,18 +197,18 @@
                 </select>
             </div>
             <div class="export-options">
-                <div class="export-btn" onclick="exportCSV()">
+                <div class="export-btn" onclick="exportExcel()">
                     <span class="icon">📊</span>
                     <div class="text">
-                        <div class="title">Export CSV</div>
-                        <div class="desc">Open in Excel / Google Sheets</div>
+                        <div class="title">Export Excel</div>
+                        <div class="desc">Download .xlsx file</div>
                     </div>
                 </div>
                 <div class="export-btn" onclick="exportPDF()">
                     <span class="icon">📄</span>
                     <div class="text">
                         <div class="title">Export PDF</div>
-                        <div class="desc">Print or save as document</div>
+                        <div class="desc">Download .pdf file</div>
                     </div>
                 </div>
                 <div class="export-btn" onclick="exportEmail()">
@@ -362,53 +365,164 @@
             return key;
         }
 
-        function exportCSV() {
+        function exportExcel() {
             const history = getFilteredHistory();
             const contentType = document.getElementById('exportContent').value;
             if (history.length === 0) { alert('No data to export for selected period'); return; }
-            let csv = '';
+            
+            let data = [];
+            let sheetName = 'Walkthrough Report';
+            
             if (contentType === 'summary') {
-                csv = 'Date,Time,Inspector,Completed,Total,Completion %,Issues Count\n';
-                history.forEach(r => { const d = new Date(r.date); const pct = ((r.completed / r.total) * 100).toFixed(1); csv += `${d.toLocaleDateString()},${d.toLocaleTimeString()},${r.inspector || 'Unknown'},${r.completed},${r.total},${pct}%,${Object.keys(r.issues || {}).length}\n`; });
+                data.push(['Date', 'Time', 'Inspector', 'Completed', 'Total', 'Completion %', 'Issues Count']);
+                history.forEach(r => {
+                    const d = new Date(r.date);
+                    const pct = ((r.completed / r.total) * 100).toFixed(1) + '%';
+                    data.push([d.toLocaleDateString(), d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}), r.inspector || 'Unknown', r.completed, r.total, pct, Object.keys(r.issues || {}).length]);
+                });
+                sheetName = 'Summary';
             } else if (contentType === 'issues') {
-                csv = 'Date,Inspector,Zone,Item,Issue Description\n';
-                history.forEach(r => { const d = new Date(r.date); Object.entries(r.issues || {}).forEach(([key, issue]) => { const itemName = getItemName(key); const [zone, item] = itemName.split(': '); csv += `${d.toLocaleDateString()},"${r.inspector || 'Unknown'}","${zone}","${item || ''}","${issue.replace(/"/g, '""')}"\n`; }); });
+                data.push(['Date', 'Inspector', 'Zone', 'Item', 'Issue Description']);
+                history.forEach(r => {
+                    const d = new Date(r.date);
+                    Object.entries(r.issues || {}).forEach(([key, issue]) => {
+                        const itemName = getItemName(key);
+                        const parts = itemName.split(': ');
+                        data.push([d.toLocaleDateString(), r.inspector || 'Unknown', parts[0], parts[1] || '', issue]);
+                    });
+                });
+                sheetName = 'Issues';
             } else {
-                csv = 'Date,Time,Inspector,Completed,Total,Issues Count,Issue Details\n';
-                history.forEach(r => { const d = new Date(r.date); const issueDetails = Object.entries(r.issues || {}).map(([key, val]) => `${getItemName(key)}: ${val}`).join(' | '); csv += `${d.toLocaleDateString()},${d.toLocaleTimeString()},"${r.inspector || 'Unknown'}",${r.completed},${r.total},${Object.keys(r.issues || {}).length},"${issueDetails.replace(/"/g, '""')}"\n`; });
+                data.push(['Date', 'Time', 'Inspector', 'Completed', 'Total', 'Issues Count', 'Issue Details']);
+                history.forEach(r => {
+                    const d = new Date(r.date);
+                    const issueDetails = Object.entries(r.issues || {}).map(([key, val]) => `${getItemName(key)}: ${val}`).join(' | ');
+                    data.push([d.toLocaleDateString(), d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}), r.inspector || 'Unknown', r.completed, r.total, Object.keys(r.issues || {}).length, issueDetails]);
+                });
+                sheetName = 'Full Report';
             }
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `InDi_Walkthrough_${new Date().toISOString().split('T')[0]}.csv`; a.click();
-            URL.revokeObjectURL(url); closeModal('exportModal');
+            
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            
+            // Auto-size columns
+            const colWidths = data[0].map((_, i) => ({wch: Math.max(...data.map(row => String(row[i] || '').length)) + 2}));
+            ws['!cols'] = colWidths;
+            
+            XLSX.writeFile(wb, `InDi_Walkthrough_${new Date().toISOString().split('T')[0]}.xlsx`);
+            closeModal('exportModal');
         }
 
         function exportPDF() {
             const history = getFilteredHistory();
             const contentType = document.getElementById('exportContent').value;
             if (history.length === 0) { alert('No data to export for selected period'); return; }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
             const totalWalkthroughs = history.length;
             const totalIssues = history.reduce((sum, r) => sum + Object.keys(r.issues || {}).length, 0);
             const avgCompletion = (history.reduce((sum, r) => sum + (r.completed / r.total), 0) / history.length * 100).toFixed(1);
-            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>InDi Walkthrough Report</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#333}h1{color:#25408F;border-bottom:2px solid #25408F;padding-bottom:10px}h2{color:#25408F;margin-top:30px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#25408F;color:white}tr:nth-child(even){background:#f8f9fa}.issue{color:#e65100}.summary{background:#e8f0fc;padding:15px;border-radius:8px;margin:20px 0}.footer{margin-top:40px;font-size:12px;color:#666;border-top:1px solid #ddd;padding-top:10px}</style></head><body>`;
-            html += `<h1>InDi Daily Walkthrough Report</h1><p><strong>Property:</strong> Uriekstes iela 2A, Rīga</p><p><strong>Generated:</strong> ${new Date().toLocaleString()}</p><p><strong>Period:</strong> ${document.getElementById('exportPeriod').selectedOptions[0].text}</p>`;
-            html += `<div class="summary"><strong>Summary:</strong> ${totalWalkthroughs} walkthrough(s) | ${totalIssues} issue(s) reported | ${avgCompletion}% avg completion</div>`;
+            const periodText = document.getElementById('exportPeriod').selectedOptions[0].text;
+            
+            // Header
+            doc.setFontSize(20);
+            doc.setTextColor(37, 64, 143);
+            doc.text('InDi Daily Walkthrough Report', 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Property: Uriekstes iela 2A, Rīga`, 14, 28);
+            doc.text(`Period: ${periodText}`, 14, 34);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 40);
+            
+            // Summary box
+            doc.setFillColor(232, 240, 252);
+            doc.rect(14, 45, 182, 15, 'F');
+            doc.setFontSize(10);
+            doc.setTextColor(37, 64, 143);
+            doc.text(`Summary: ${totalWalkthroughs} walkthrough(s) | ${totalIssues} issue(s) reported | ${avgCompletion}% avg completion`, 18, 54);
+            
+            let yPos = 70;
+            
             if (contentType === 'summary' || contentType === 'all') {
-                html += `<h2>Walkthrough History</h2><table><tr><th>Date</th><th>Time</th><th>Inspector</th><th>Completed</th><th>Issues</th></tr>`;
-                history.forEach(r => { const d = new Date(r.date); const issueCount = Object.keys(r.issues || {}).length; html += `<tr><td>${d.toLocaleDateString()}</td><td>${d.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})}</td><td>${r.inspector || 'Unknown'}</td><td>${r.completed}/${r.total}</td><td class="${issueCount > 0 ? 'issue' : ''}">${issueCount > 0 ? '⚠ ' + issueCount : '✓'}</td></tr>`; });
-                html += '</table>';
+                doc.setFontSize(14);
+                doc.setTextColor(37, 64, 143);
+                doc.text('Walkthrough History', 14, yPos);
+                yPos += 5;
+                
+                const tableData = history.map(r => {
+                    const d = new Date(r.date);
+                    const issueCount = Object.keys(r.issues || {}).length;
+                    return [
+                        d.toLocaleDateString(),
+                        d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
+                        r.inspector || 'Unknown',
+                        `${r.completed}/${r.total}`,
+                        issueCount > 0 ? `⚠ ${issueCount}` : '✓'
+                    ];
+                });
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Date', 'Time', 'Inspector', 'Completed', 'Issues']],
+                    body: tableData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [37, 64, 143] },
+                    styles: { fontSize: 9 }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 15;
             }
+            
             if (contentType === 'issues' || contentType === 'all') {
                 const allIssues = [];
-                history.forEach(r => { Object.entries(r.issues || {}).forEach(([key, issue]) => { allIssues.push({ date: new Date(r.date), inspector: r.inspector, item: getItemName(key), issue: issue }); }); });
+                history.forEach(r => {
+                    Object.entries(r.issues || {}).forEach(([key, issue]) => {
+                        allIssues.push({
+                            date: new Date(r.date).toLocaleDateString(),
+                            inspector: r.inspector || 'Unknown',
+                            item: getItemName(key),
+                            issue: issue
+                        });
+                    });
+                });
+                
                 if (allIssues.length > 0) {
-                    html += `<h2>Issues Reported</h2><table><tr><th>Date</th><th>Inspector</th><th>Item</th><th>Issue Description</th></tr>`;
-                    allIssues.forEach(i => { html += `<tr><td>${i.date.toLocaleDateString()}</td><td>${i.inspector || 'Unknown'}</td><td>${i.item}</td><td class="issue">${i.issue}</td></tr>`; });
-                    html += '</table>';
-                } else if (contentType === 'issues') { html += '<p>No issues reported in selected period.</p>'; }
+                    if (yPos > 250) { doc.addPage(); yPos = 20; }
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(37, 64, 143);
+                    doc.text('Issues Reported', 14, yPos);
+                    yPos += 5;
+                    
+                    const issueData = allIssues.map(i => [i.date, i.inspector, i.item, i.issue]);
+                    
+                    doc.autoTable({
+                        startY: yPos,
+                        head: [['Date', 'Inspector', 'Item', 'Issue Description']],
+                        body: issueData,
+                        theme: 'grid',
+                        headStyles: { fillColor: [37, 64, 143] },
+                        styles: { fontSize: 8 },
+                        columnStyles: { 3: { cellWidth: 60 } }
+                    });
+                }
             }
-            html += `<div class="footer"><p>Generated by InDi Daily Walkthrough App | Colliers Latvia</p></div></body></html>`;
-            const printWindow = window.open('', '_blank'); printWindow.document.write(html); printWindow.document.close(); printWindow.print();
+            
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                doc.text('Generated by InDi Daily Walkthrough App | Colliers Latvia', 14, 287);
+                doc.text(`Page ${i} of ${pageCount}`, 180, 287);
+            }
+            
+            doc.save(`InDi_Walkthrough_${new Date().toISOString().split('T')[0]}.pdf`);
             closeModal('exportModal');
         }
 
