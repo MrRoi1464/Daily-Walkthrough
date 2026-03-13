@@ -35,259 +35,128 @@
             width: 0%;
             transition: width 0.3s ease;
         }
-        .progress-text {
-            font-size: 11px;
-            margin-top: 6px;
-            opacity: 0.9;
-        }
-        .tabs {
-            display: flex;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
+        .progress-text { font-size: 11px; margin-top: 6px; opacity: 0.9; }
+        .tabs { display: flex; background: white; border-bottom: 1px solid #e0e0e0; }
         .tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            border: none;
-            background: none;
-            cursor: pointer;
+            flex: 1; padding: 12px; text-align: center; font-size: 14px;
+            font-weight: 500; color: #666; border: none; background: none; cursor: pointer;
         }
-        .tab.active {
-            color: #25408F;
-            border-bottom: 2px solid #25408F;
-        }
+        .tab.active { color: #25408F; border-bottom: 2px solid #25408F; }
         .content { padding: 16px; }
         .section {
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: white; border-radius: 12px; margin-bottom: 16px;
+            overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .section-header {
-            background: #f8f9fa;
-            padding: 14px 16px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #25408F;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
+            background: #f8f9fa; padding: 14px 16px; font-weight: 600; font-size: 14px;
+            color: #25408F; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
-        .section-count {
-            background: #e8f0fc;
-            color: #25408F;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-        }
+        .section-count { background: #e8f0fc; color: #25408F; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
         .section-items { display: block; }
         .section.collapsed .section-items { display: none; }
         .item {
-            display: flex;
-            align-items: center;
-            padding: 14px 16px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background 0.2s;
+            display: flex; align-items: center; padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s;
         }
         .item:last-child { border-bottom: none; }
         .item:active { background: #f5f5f5; }
         .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            margin-right: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.2s;
+            width: 24px; height: 24px; border: 2px solid #ccc; border-radius: 6px;
+            margin-right: 14px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
         }
-        .item.checked .checkbox {
-            background: #4CAF50;
-            border-color: #4CAF50;
-        }
-        .checkbox::after {
-            content: '✓';
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            opacity: 0;
-        }
+        .item.checked .checkbox { background: #4CAF50; border-color: #4CAF50; }
+        .checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; opacity: 0; }
         .item.checked .checkbox::after { opacity: 1; }
-        .item-text {
-            flex: 1;
-            font-size: 15px;
-            color: #333;
-        }
-        .item.checked .item-text {
-            color: #999;
-            text-decoration: line-through;
-        }
-        .issue-btn {
-            background: none;
-            border: none;
-            color: #ff9800;
-            font-size: 20px;
-            padding: 4px 8px;
-            cursor: pointer;
-        }
+        .item-text { flex: 1; font-size: 15px; color: #333; }
+        .item.checked .item-text { color: #999; text-decoration: line-through; }
+        .issue-btn { background: none; border: none; color: #ff9800; font-size: 20px; padding: 4px 8px; cursor: pointer; }
         .inspector-input {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: white; border-radius: 12px; padding: 16px;
+            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .inspector-input label {
-            font-size: 12px;
-            color: #666;
-            display: block;
-            margin-bottom: 6px;
-        }
-        .inspector-input input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
+        .inspector-input label { font-size: 12px; color: #666; display: block; margin-bottom: 6px; }
+        .inspector-input input, .inspector-input select {
+            width: 100%; padding: 10px 12px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 16px; margin-bottom: 10px;
         }
         .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 12px 16px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 12px;
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            padding: 12px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; gap: 12px;
         }
         .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
+            flex: 1; padding: 14px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
         }
-        .btn-primary {
-            background: #25408F;
-            color: white;
-        }
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
+        .btn-primary { background: #25408F; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-export { background: #e8f0fc; color: #25408F; }
         .history-item {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: white; border-radius: 12px; padding: 16px;
+            margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .history-date {
-            font-weight: 600;
-            color: #25408F;
-            margin-bottom: 4px;
-        }
-        .history-meta {
-            font-size: 13px;
-            color: #666;
-        }
-        .history-issues {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-            font-size: 13px;
-            color: #e65100;
-        }
+        .history-date { font-weight: 600; color: #25408F; margin-bottom: 4px; }
+        .history-meta { font-size: 13px; color: #666; }
+        .history-issues { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 13px; color: #e65100; }
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 200; align-items: center;
+            justify-content: center; padding: 20px;
         }
         .modal.show { display: flex; }
         .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            max-width: 340px;
+            background: white; border-radius: 16px; padding: 20px;
+            width: 100%; max-width: 340px; max-height: 90vh; overflow-y: auto;
         }
-        .modal h3 {
-            margin-bottom: 16px;
-            color: #333;
-        }
+        .modal h3 { margin-bottom: 16px; color: #333; }
         .modal textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 15px;
-            min-height: 100px;
-            resize: none;
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 15px; min-height: 100px; resize: none;
         }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
+        .modal select {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 15px; margin-bottom: 12px;
         }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
+        .modal-buttons { display: flex; gap: 10px; margin-top: 16px; }
+        .export-options { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .export-btn {
+            display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+            background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 10px;
+            cursor: pointer; transition: background 0.2s;
         }
+        .export-btn:hover { background: #e8f0fc; }
+        .export-btn .icon { font-size: 24px; }
+        .export-btn .text { flex: 1; }
+        .export-btn .title { font-weight: 600; color: #333; font-size: 15px; }
+        .export-btn .desc { font-size: 12px; color: #666; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
         .complete-banner {
-            background: #4CAF50;
-            color: white;
-            padding: 16px;
-            text-align: center;
-            font-weight: 600;
-            display: none;
+            background: #4CAF50; color: white; padding: 16px;
+            text-align: center; font-weight: 600; display: none;
         }
         .complete-banner.show { display: block; }
+        .period-selector { margin-bottom: 16px; }
+        .period-selector label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>InDi Daily Walkthrough</h1>
         <p>Uriekstes iela 2A, Rīga</p>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         <div class="progress-text"><span id="progressText">0 / 0</span> items completed</div>
     </div>
-
     <div class="complete-banner" id="completeBanner">✓ Walkthrough Complete!</div>
-
     <div class="tabs">
         <button class="tab active" onclick="showTab('checklist')">Checklist</button>
         <button class="tab" onclick="showTab('history')">History</button>
     </div>
-
     <div id="checklistTab" class="content"></div>
     <div id="historyTab" class="content" style="display:none;"></div>
-
     <div class="bottom-bar">
         <button class="btn btn-secondary" onclick="resetChecklist()">Reset</button>
-        <button class="btn btn-primary" onclick="saveWalkthrough()">Save & Complete</button>
+        <button class="btn btn-export" onclick="openExportModal()">Export</button>
+        <button class="btn btn-primary" onclick="saveWalkthrough()">Save</button>
     </div>
 
     <div class="modal" id="issueModal">
@@ -296,110 +165,79 @@
             <p style="font-size:14px;color:#666;margin-bottom:12px;" id="issueItemName"></p>
             <textarea id="issueNote" placeholder="Describe the issue..."></textarea>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal('issueModal')">Cancel</button>
                 <button class="btn btn-primary" onclick="saveIssue()">Save Issue</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h3>Export Report</h3>
+            <div class="period-selector">
+                <label>Select Period</label>
+                <select id="exportPeriod">
+                    <option value="today">Today only</option>
+                    <option value="week">Last 7 days</option>
+                    <option value="month" selected>Last 30 days</option>
+                    <option value="3months">Last 3 months</option>
+                    <option value="6months">Last 6 months</option>
+                    <option value="all">All history</option>
+                </select>
+            </div>
+            <div class="period-selector">
+                <label>What to export</label>
+                <select id="exportContent">
+                    <option value="all" selected>Full report (all items)</option>
+                    <option value="issues">Issues only</option>
+                    <option value="summary">Summary only</option>
+                </select>
+            </div>
+            <div class="export-options">
+                <div class="export-btn" onclick="exportCSV()">
+                    <span class="icon">📊</span>
+                    <div class="text">
+                        <div class="title">Export CSV</div>
+                        <div class="desc">Open in Excel / Google Sheets</div>
+                    </div>
+                </div>
+                <div class="export-btn" onclick="exportPDF()">
+                    <span class="icon">📄</span>
+                    <div class="text">
+                        <div class="title">Export PDF</div>
+                        <div class="desc">Print or save as document</div>
+                    </div>
+                </div>
+                <div class="export-btn" onclick="exportEmail()">
+                    <span class="icon">📧</span>
+                    <div class="text">
+                        <div class="title">Send via Email</div>
+                        <div class="desc">Open in mail app</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('exportModal')">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
         const CHECKLIST = [
-            {
-                name: "Entrances & Lobby",
-                items: [
-                    "Main entrance doors functioning",
-                    "Access control / intercom working",
-                    "Lobby clean, no debris",
-                    "Floor mats in place, clean",
-                    "Lighting working",
-                    "Signage visible, undamaged"
-                ]
-            },
-            {
-                name: "Common Area WCs",
-                items: [
-                    "Toilets functioning",
-                    "No odours",
-                    "Soap dispensers filled",
-                    "Paper towels / toilet paper stocked",
-                    "Floors clean, dry",
-                    "Air fresheners working",
-                    "No leaks or drips"
-                ]
-            },
-            {
-                name: "Stairwells & Corridors",
-                items: [
-                    "Lighting working",
-                    "Handrails secure",
-                    "Floors clean, no hazards",
-                    "Fire doors closing properly",
-                    "Emergency exit signs lit"
-                ]
-            },
-            {
-                name: "Elevators",
-                items: [
-                    "Operating normally",
-                    "Interior clean",
-                    "Lighting working",
-                    "Buttons/display functioning",
-                    "No unusual sounds"
-                ]
-            },
-            {
-                name: "Roof",
-                items: [
-                    "Access door secured",
-                    "No visible membrane damage",
-                    "Drains clear, no ponding water",
-                    "No debris or loose objects",
-                    "Lightning protection intact"
-                ]
-            },
-            {
-                name: "Parking & Exterior",
-                items: [
-                    "Parking area clean, no debris",
-                    "No potholes / puddles",
-                    "Lighting working",
-                    "Snow/ice cleared (winter)",
-                    "Waste containers not overflowing",
-                    "Perimeter fencing intact"
-                ]
-            },
-            {
-                name: "Technical Rooms",
-                items: [
-                    "No water leaks",
-                    "No unusual sounds/smells",
-                    "Temperature normal",
-                    "Access secured"
-                ]
-            },
-            {
-                name: "General",
-                items: [
-                    "All building systems operating normally",
-                    "No tenant complaints received"
-                ]
-            }
+            { name: "Entrances & Lobby", items: ["Main entrance doors functioning","Access control / intercom working","Lobby clean, no debris","Floor mats in place, clean","Lighting working","Signage visible, undamaged"] },
+            { name: "Common Area WCs", items: ["Toilets functioning","No odours","Soap dispensers filled","Paper towels / toilet paper stocked","Floors clean, dry","Air fresheners working","No leaks or drips"] },
+            { name: "Stairwells & Corridors", items: ["Lighting working","Handrails secure","Floors clean, no hazards","Fire doors closing properly","Emergency exit signs lit"] },
+            { name: "Elevators", items: ["Operating normally","Interior clean","Lighting working","Buttons/display functioning","No unusual sounds"] },
+            { name: "Roof", items: ["Access door secured","No visible membrane damage","Drains clear, no ponding water","No debris or loose objects","Lightning protection intact"] },
+            { name: "Parking & Exterior", items: ["Parking area clean, no debris","No potholes / puddles","Lighting working","Snow/ice cleared (winter)","Waste containers not overflowing","Perimeter fencing intact"] },
+            { name: "Technical Rooms", items: ["No water leaks","No unusual sounds/smells","Temperature normal","Access secured"] },
+            { name: "General", items: ["All building systems operating normally","No tenant complaints received"] }
         ];
 
-        let state = {
-            checked: {},
-            issues: {},
-            inspector: ''
-        };
-
+        let state = { checked: {}, issues: {}, inspector: '' };
         let currentIssueKey = null;
 
-        function init() {
-            loadState();
-            renderChecklist();
-            renderHistory();
-            updateProgress();
-        }
+        function init() { loadState(); renderChecklist(); renderHistory(); updateProgress(); }
 
         function loadState() {
             const saved = localStorage.getItem('indi_walkthrough_state');
@@ -408,9 +246,7 @@
                 const today = new Date().toDateString();
                 if (parsed.date !== today) {
                     state = { checked: {}, issues: {}, inspector: parsed.inspector || '' };
-                } else {
-                    state = parsed;
-                }
+                } else { state = parsed; }
             }
         }
 
@@ -421,86 +257,32 @@
 
         function renderChecklist() {
             const container = document.getElementById('checklistTab');
-            let html = `
-                <div class="inspector-input">
-                    <label>Inspector Name</label>
-                    <input type="text" id="inspectorName" placeholder="Your name" 
-                           value="${state.inspector}" onchange="updateInspector(this.value)">
-                </div>
-            `;
-
+            let html = `<div class="inspector-input"><label>Inspector Name</label><input type="text" id="inspectorName" placeholder="Your name" value="${state.inspector}" onchange="updateInspector(this.value)"></div>`;
             CHECKLIST.forEach((section, sIdx) => {
-                const checkedCount = section.items.filter((_, iIdx) => 
-                    state.checked[`${sIdx}-${iIdx}`]
-                ).length;
-
-                html += `
-                    <div class="section" id="section-${sIdx}">
-                        <div class="section-header" onclick="toggleSection(${sIdx})">
-                            <span>${section.name}</span>
-                            <span class="section-count">${checkedCount}/${section.items.length}</span>
-                        </div>
-                        <div class="section-items">
-                `;
-
+                const checkedCount = section.items.filter((_, iIdx) => state.checked[`${sIdx}-${iIdx}`]).length;
+                html += `<div class="section" id="section-${sIdx}"><div class="section-header" onclick="toggleSection(${sIdx})"><span>${section.name}</span><span class="section-count">${checkedCount}/${section.items.length}</span></div><div class="section-items">`;
                 section.items.forEach((item, iIdx) => {
                     const key = `${sIdx}-${iIdx}`;
                     const isChecked = state.checked[key];
                     const hasIssue = state.issues[key];
-
-                    html += `
-                        <div class="item ${isChecked ? 'checked' : ''}" id="item-${key}">
-                            <div class="checkbox" onclick="toggleItem('${key}')"></div>
-                            <span class="item-text" onclick="toggleItem('${key}')">${item}</span>
-                            <button class="issue-btn" onclick="openIssue('${key}', '${item}')" 
-                                    style="color: ${hasIssue ? '#e65100' : '#ccc'}">
-                                ${hasIssue ? '⚠' : '⚑'}
-                            </button>
-                        </div>
-                    `;
+                    html += `<div class="item ${isChecked ? 'checked' : ''}" id="item-${key}"><div class="checkbox" onclick="toggleItem('${key}')"></div><span class="item-text" onclick="toggleItem('${key}')">${item}</span><button class="issue-btn" onclick="openIssue('${key}', '${item}')" style="color: ${hasIssue ? '#e65100' : '#ccc'}">${hasIssue ? '⚠' : '⚑'}</button></div>`;
                 });
-
                 html += `</div></div>`;
             });
-
             container.innerHTML = html;
         }
 
-        function toggleSection(idx) {
-            document.getElementById(`section-${idx}`).classList.toggle('collapsed');
-        }
-
-        function toggleItem(key) {
-            state.checked[key] = !state.checked[key];
-            saveState();
-            renderChecklist();
-            updateProgress();
-        }
-
-        function updateInspector(name) {
-            state.inspector = name;
-            saveState();
-        }
+        function toggleSection(idx) { document.getElementById(`section-${idx}`).classList.toggle('collapsed'); }
+        function toggleItem(key) { state.checked[key] = !state.checked[key]; saveState(); renderChecklist(); updateProgress(); }
+        function updateInspector(name) { state.inspector = name; saveState(); }
 
         function updateProgress() {
             let total = 0, checked = 0;
-            CHECKLIST.forEach((section, sIdx) => {
-                section.items.forEach((_, iIdx) => {
-                    total++;
-                    if (state.checked[`${sIdx}-${iIdx}`]) checked++;
-                });
-            });
-
+            CHECKLIST.forEach((section, sIdx) => { section.items.forEach((_, iIdx) => { total++; if (state.checked[`${sIdx}-${iIdx}`]) checked++; }); });
             const pct = total > 0 ? (checked / total * 100) : 0;
             document.getElementById('progressFill').style.width = pct + '%';
             document.getElementById('progressText').textContent = `${checked} / ${total}`;
-
-            const banner = document.getElementById('completeBanner');
-            if (checked === total && total > 0) {
-                banner.classList.add('show');
-            } else {
-                banner.classList.remove('show');
-            }
+            document.getElementById('completeBanner').classList.toggle('show', checked === total && total > 0);
         }
 
         function openIssue(key, itemName) {
@@ -510,115 +292,152 @@
             document.getElementById('issueModal').classList.add('show');
         }
 
-        function closeModal() {
-            document.getElementById('issueModal').classList.remove('show');
-            currentIssueKey = null;
-        }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('show'); if (modalId === 'issueModal') currentIssueKey = null; }
 
         function saveIssue() {
             const note = document.getElementById('issueNote').value.trim();
-            if (note) {
-                state.issues[currentIssueKey] = note;
-            } else {
-                delete state.issues[currentIssueKey];
-            }
-            saveState();
-            renderChecklist();
-            closeModal();
+            if (note) { state.issues[currentIssueKey] = note; } else { delete state.issues[currentIssueKey]; }
+            saveState(); renderChecklist(); closeModal('issueModal');
         }
 
         function resetChecklist() {
-            if (confirm('Reset all checkboxes?')) {
-                state.checked = {};
-                state.issues = {};
-                saveState();
-                renderChecklist();
-                updateProgress();
-            }
+            if (confirm('Reset all checkboxes?')) { state.checked = {}; state.issues = {}; saveState(); renderChecklist(); updateProgress(); }
         }
 
         function saveWalkthrough() {
             let total = 0, checked = 0;
-            CHECKLIST.forEach((section, sIdx) => {
-                section.items.forEach((_, iIdx) => {
-                    total++;
-                    if (state.checked[`${sIdx}-${iIdx}`]) checked++;
-                });
-            });
-
-            const record = {
-                date: new Date().toISOString(),
-                inspector: state.inspector,
-                completed: checked,
-                total: total,
-                issues: { ...state.issues }
-            };
-
+            CHECKLIST.forEach((section, sIdx) => { section.items.forEach((_, iIdx) => { total++; if (state.checked[`${sIdx}-${iIdx}`]) checked++; }); });
+            const record = { date: new Date().toISOString(), inspector: state.inspector, completed: checked, total: total, issues: { ...state.issues }, checkedItems: { ...state.checked } };
             let history = JSON.parse(localStorage.getItem('indi_walkthrough_history') || '[]');
             history.unshift(record);
-            history = history.slice(0, 30);
+            history = history.slice(0, 90);
             localStorage.setItem('indi_walkthrough_history', JSON.stringify(history));
-
-            state.checked = {};
-            state.issues = {};
-            saveState();
-            renderChecklist();
-            renderHistory();
-            updateProgress();
-
+            state.checked = {}; state.issues = {}; saveState(); renderChecklist(); renderHistory(); updateProgress();
             alert('Walkthrough saved!');
         }
 
         function renderHistory() {
             const container = document.getElementById('historyTab');
             const history = JSON.parse(localStorage.getItem('indi_walkthrough_history') || '[]');
-
-            if (history.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>No completed walkthroughs yet</p>
-                    </div>
-                `;
-                return;
-            }
-
+            if (history.length === 0) { container.innerHTML = `<div class="empty-state"><p>No completed walkthroughs yet</p></div>`; return; }
             let html = '';
             history.forEach(record => {
                 const date = new Date(record.date);
-                const dateStr = date.toLocaleDateString('en-GB', { 
-                    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' 
-                });
-                const timeStr = date.toLocaleTimeString('en-GB', { 
-                    hour: '2-digit', minute: '2-digit' 
-                });
-
+                const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
                 const issueCount = Object.keys(record.issues || {}).length;
-
-                html += `
-                    <div class="history-item">
-                        <div class="history-date">${dateStr}</div>
-                        <div class="history-meta">
-                            ${timeStr} • ${record.inspector || 'Unknown'} • 
-                            ${record.completed}/${record.total} items
-                        </div>
-                        ${issueCount > 0 ? `
-                            <div class="history-issues">
-                                ⚠ ${issueCount} issue${issueCount > 1 ? 's' : ''} reported
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
+                html += `<div class="history-item"><div class="history-date">${dateStr}</div><div class="history-meta">${timeStr} • ${record.inspector || 'Unknown'} • ${record.completed}/${record.total} items</div>${issueCount > 0 ? `<div class="history-issues">⚠ ${issueCount} issue${issueCount > 1 ? 's' : ''} reported</div>` : ''}</div>`;
             });
-
             container.innerHTML = html;
         }
 
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-
             document.getElementById('checklistTab').style.display = tab === 'checklist' ? 'block' : 'none';
             document.getElementById('historyTab').style.display = tab === 'history' ? 'block' : 'none';
+        }
+
+        function openExportModal() { document.getElementById('exportModal').classList.add('show'); }
+
+        function getFilteredHistory() {
+            const period = document.getElementById('exportPeriod').value;
+            const history = JSON.parse(localStorage.getItem('indi_walkthrough_history') || '[]');
+            const now = new Date();
+            let cutoffDate = new Date(0);
+            switch(period) {
+                case 'today': cutoffDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()); break;
+                case 'week': cutoffDate = new Date(now - 7 * 24 * 60 * 60 * 1000); break;
+                case 'month': cutoffDate = new Date(now - 30 * 24 * 60 * 60 * 1000); break;
+                case '3months': cutoffDate = new Date(now - 90 * 24 * 60 * 60 * 1000); break;
+                case '6months': cutoffDate = new Date(now - 180 * 24 * 60 * 60 * 1000); break;
+                case 'all': default: cutoffDate = new Date(0);
+            }
+            return history.filter(r => new Date(r.date) >= cutoffDate);
+        }
+
+        function getItemName(key) {
+            const [sIdx, iIdx] = key.split('-').map(Number);
+            if (CHECKLIST[sIdx] && CHECKLIST[sIdx].items[iIdx]) { return CHECKLIST[sIdx].name + ': ' + CHECKLIST[sIdx].items[iIdx]; }
+            return key;
+        }
+
+        function exportCSV() {
+            const history = getFilteredHistory();
+            const contentType = document.getElementById('exportContent').value;
+            if (history.length === 0) { alert('No data to export for selected period'); return; }
+            let csv = '';
+            if (contentType === 'summary') {
+                csv = 'Date,Time,Inspector,Completed,Total,Completion %,Issues Count\n';
+                history.forEach(r => { const d = new Date(r.date); const pct = ((r.completed / r.total) * 100).toFixed(1); csv += `${d.toLocaleDateString()},${d.toLocaleTimeString()},${r.inspector || 'Unknown'},${r.completed},${r.total},${pct}%,${Object.keys(r.issues || {}).length}\n`; });
+            } else if (contentType === 'issues') {
+                csv = 'Date,Inspector,Zone,Item,Issue Description\n';
+                history.forEach(r => { const d = new Date(r.date); Object.entries(r.issues || {}).forEach(([key, issue]) => { const itemName = getItemName(key); const [zone, item] = itemName.split(': '); csv += `${d.toLocaleDateString()},"${r.inspector || 'Unknown'}","${zone}","${item || ''}","${issue.replace(/"/g, '""')}"\n`; }); });
+            } else {
+                csv = 'Date,Time,Inspector,Completed,Total,Issues Count,Issue Details\n';
+                history.forEach(r => { const d = new Date(r.date); const issueDetails = Object.entries(r.issues || {}).map(([key, val]) => `${getItemName(key)}: ${val}`).join(' | '); csv += `${d.toLocaleDateString()},${d.toLocaleTimeString()},"${r.inspector || 'Unknown'}",${r.completed},${r.total},${Object.keys(r.issues || {}).length},"${issueDetails.replace(/"/g, '""')}"\n`; });
+            }
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `InDi_Walkthrough_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+            URL.revokeObjectURL(url); closeModal('exportModal');
+        }
+
+        function exportPDF() {
+            const history = getFilteredHistory();
+            const contentType = document.getElementById('exportContent').value;
+            if (history.length === 0) { alert('No data to export for selected period'); return; }
+            const totalWalkthroughs = history.length;
+            const totalIssues = history.reduce((sum, r) => sum + Object.keys(r.issues || {}).length, 0);
+            const avgCompletion = (history.reduce((sum, r) => sum + (r.completed / r.total), 0) / history.length * 100).toFixed(1);
+            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>InDi Walkthrough Report</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#333}h1{color:#25408F;border-bottom:2px solid #25408F;padding-bottom:10px}h2{color:#25408F;margin-top:30px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#25408F;color:white}tr:nth-child(even){background:#f8f9fa}.issue{color:#e65100}.summary{background:#e8f0fc;padding:15px;border-radius:8px;margin:20px 0}.footer{margin-top:40px;font-size:12px;color:#666;border-top:1px solid #ddd;padding-top:10px}</style></head><body>`;
+            html += `<h1>InDi Daily Walkthrough Report</h1><p><strong>Property:</strong> Uriekstes iela 2A, Rīga</p><p><strong>Generated:</strong> ${new Date().toLocaleString()}</p><p><strong>Period:</strong> ${document.getElementById('exportPeriod').selectedOptions[0].text}</p>`;
+            html += `<div class="summary"><strong>Summary:</strong> ${totalWalkthroughs} walkthrough(s) | ${totalIssues} issue(s) reported | ${avgCompletion}% avg completion</div>`;
+            if (contentType === 'summary' || contentType === 'all') {
+                html += `<h2>Walkthrough History</h2><table><tr><th>Date</th><th>Time</th><th>Inspector</th><th>Completed</th><th>Issues</th></tr>`;
+                history.forEach(r => { const d = new Date(r.date); const issueCount = Object.keys(r.issues || {}).length; html += `<tr><td>${d.toLocaleDateString()}</td><td>${d.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})}</td><td>${r.inspector || 'Unknown'}</td><td>${r.completed}/${r.total}</td><td class="${issueCount > 0 ? 'issue' : ''}">${issueCount > 0 ? '⚠ ' + issueCount : '✓'}</td></tr>`; });
+                html += '</table>';
+            }
+            if (contentType === 'issues' || contentType === 'all') {
+                const allIssues = [];
+                history.forEach(r => { Object.entries(r.issues || {}).forEach(([key, issue]) => { allIssues.push({ date: new Date(r.date), inspector: r.inspector, item: getItemName(key), issue: issue }); }); });
+                if (allIssues.length > 0) {
+                    html += `<h2>Issues Reported</h2><table><tr><th>Date</th><th>Inspector</th><th>Item</th><th>Issue Description</th></tr>`;
+                    allIssues.forEach(i => { html += `<tr><td>${i.date.toLocaleDateString()}</td><td>${i.inspector || 'Unknown'}</td><td>${i.item}</td><td class="issue">${i.issue}</td></tr>`; });
+                    html += '</table>';
+                } else if (contentType === 'issues') { html += '<p>No issues reported in selected period.</p>'; }
+            }
+            html += `<div class="footer"><p>Generated by InDi Daily Walkthrough App | Colliers Latvia</p></div></body></html>`;
+            const printWindow = window.open('', '_blank'); printWindow.document.write(html); printWindow.document.close(); printWindow.print();
+            closeModal('exportModal');
+        }
+
+        function exportEmail() {
+            const history = getFilteredHistory();
+            const contentType = document.getElementById('exportContent').value;
+            if (history.length === 0) { alert('No data to export for selected period'); return; }
+            const periodText = document.getElementById('exportPeriod').selectedOptions[0].text;
+            const totalWalkthroughs = history.length;
+            const totalIssues = history.reduce((sum, r) => sum + Object.keys(r.issues || {}).length, 0);
+            const avgCompletion = (history.reduce((sum, r) => sum + (r.completed / r.total), 0) / history.length * 100).toFixed(1);
+            let body = `InDi Daily Walkthrough Report\nProperty: Uriekstes iela 2A, Rīga\nPeriod: ${periodText}\nGenerated: ${new Date().toLocaleString()}\n\n═══════════════════════════════\nSUMMARY\n═══════════════════════════════\nTotal walkthroughs: ${totalWalkthroughs}\nIssues reported: ${totalIssues}\nAverage completion: ${avgCompletion}%\n\n`;
+            if (contentType === 'summary' || contentType === 'all') {
+                body += `═══════════════════════════════\nWALKTHROUGH HISTORY\n═══════════════════════════════\n`;
+                history.forEach(r => { const d = new Date(r.date); const issueCount = Object.keys(r.issues || {}).length; body += `${d.toLocaleDateString()} ${d.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})} | ${r.inspector || 'Unknown'} | ${r.completed}/${r.total} | ${issueCount > 0 ? '⚠ ' + issueCount + ' issues' : '✓ OK'}\n`; });
+                body += '\n';
+            }
+            if (contentType === 'issues' || contentType === 'all') {
+                const allIssues = [];
+                history.forEach(r => { Object.entries(r.issues || {}).forEach(([key, issue]) => { allIssues.push({ date: new Date(r.date), inspector: r.inspector, item: getItemName(key), issue: issue }); }); });
+                if (allIssues.length > 0) {
+                    body += `═══════════════════════════════\nISSUES REPORTED\n═══════════════════════════════\n`;
+                    allIssues.forEach(i => { body += `\n${i.date.toLocaleDateString()} - ${i.inspector || 'Unknown'}\nItem: ${i.item}\nIssue: ${i.issue}\n`; });
+                }
+            }
+            body += `\n───────────────────────────────\nSent from InDi Daily Walkthrough App\n`;
+            const subject = `InDi Walkthrough Report - ${periodText}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            closeModal('exportModal');
         }
 
         init();
