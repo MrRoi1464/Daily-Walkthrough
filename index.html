@@ -264,7 +264,7 @@
             const avgCompletion = (history.reduce((sum, r) => sum + (r.completed / r.total), 0) / history.length * 100).toFixed(1);
             const periodText = document.getElementById('exportPeriod').selectedOptions[0].text;
             doc.setFontSize(20); doc.setTextColor(37, 64, 143); doc.text('InDi Daily Walkthrough Report', 14, 20);
-            doc.setFontSize(10); doc.setTextColor(100); doc.text(`Property: Uriekstes iela 2A, Riga, 14, 28); doc.text(`Period: ${periodText}`, 14, 34); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 40);
+            doc.setFontSize(10); doc.setTextColor(100); doc.text(`Property: Uriekstes iela 2A, Rīga`, 14, 28); doc.text(`Period: ${periodText}`, 14, 34); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 40);
             doc.setFillColor(232, 240, 252); doc.rect(14, 45, 182, 15, 'F'); doc.setFontSize(10); doc.setTextColor(37, 64, 143); doc.text(`Summary: ${totalWalkthroughs} walkthrough(s) | ${totalIssues} issue(s) reported | ${avgCompletion}% avg completion`, 18, 54);
             let yPos = 70;
             if (contentType === 'summary' || contentType === 'all') {
