@@ -1,1388 +1,321 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>LinkedIn Content Engine — PropFlow</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>InDi Daily Walkthrough</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        :root {
-            --bg: #0f0f14;
-            --surface: #1a1a24;
-            --surface2: #22222e;
-            --border: #2a2a3a;
-            --text: #e8e8ef;
-            --text2: #8888a0;
-            --accent: #6366f1;
-            --accent2: #818cf8;
-            --green: #22c55e;
-            --orange: #f59e0b;
-            --red: #ef4444;
-            --blue: #3b82f6;
-            --radius: 12px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        /* NAV */
-        .nav {
-            display: flex;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-item {
-            flex: 1;
-            padding: 14px 8px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text2);
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .nav-item.active {
-            color: var(--accent2);
-            border-bottom-color: var(--accent);
-        }
-
-        .nav-item:hover {
-            color: var(--text);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-        }
-
-        /* HEADER */
-        .page-header {
-            padding: 20px 16px 12px;
-        }
-
-        .page-header h1 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .page-header p {
-            font-size: 13px;
-            color: var(--text2);
-            margin-top: 4px;
-        }
-
-        /* TAB CONTENT */
-        .tab-content {
-            display: none;
-            padding: 0 16px 100px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* CARDS */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: border-color 0.2s;
-        }
-
-        .card:hover {
-            border-color: var(--accent);
-        }
-
-        /* SWIPE FILE */
-        .swipe-card {
-            position: relative;
-        }
-
-        .swipe-author {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--accent2);
-        }
-
-        .swipe-title {
-            font-size: 12px;
-            color: var(--text2);
-            margin-top: 2px;
-        }
-
-        .swipe-text {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-top: 10px;
-            color: var(--text);
-            white-space: pre-line;
-        }
-
-        .swipe-text.collapsed {
-            max-height: 80px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .swipe-text.collapsed::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: linear-gradient(transparent, var(--surface));
-        }
-
-        .swipe-meta {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .tag {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .tag-pillar {
-            background: rgba(99, 102, 241, 0.15);
-            color: var(--accent2);
-        }
-
-        .tag-engagement-high {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-        }
-
-        .tag-engagement-medium {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-        }
-
-        .tag-engagement-low {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
-        }
-
-        .swipe-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .swipe-actions button {
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--surface2);
-            color: var(--text2);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .swipe-actions button:hover {
-            border-color: var(--accent);
-            color: var(--accent2);
-        }
-
-        .swipe-link {
-            color: var(--accent2);
-            font-size: 12px;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 8px;
-        }
-
-        .swipe-link:hover {
-            text-decoration: underline;
-        }
-
-        /* ADD POST FORM */
-        .add-form {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .add-form.collapsed .form-body {
-            display: none;
-        }
-
-        .form-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-
-        .form-toggle h3 {
-            font-size: 14px;
-            color: var(--text);
-        }
-
-        .form-toggle .toggle-icon {
-            font-size: 18px;
-            color: var(--text2);
-            transition: transform 0.2s;
-        }
-
-        .form-body {
-            margin-top: 16px;
-        }
-
-        label {
-            font-size: 12px;
-            color: var(--text2);
-            display: block;
-            margin-bottom: 6px;
-            margin-top: 12px;
-        }
-
-        label:first-child {
-            margin-top: 0;
-        }
-
-        textarea,
-        input,
-        select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--surface2);
-            color: var(--text);
-            font-size: 14px;
-            font-family: inherit;
-            resize: none;
-        }
-
-        textarea:focus,
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        select {
-            cursor: pointer;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-row>* {
-            flex: 1;
-        }
-
-        /* BUTTONS */
-        .btn {
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-accent {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-accent:hover {
-            background: var(--accent2);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text2);
-        }
-
-        .btn-ghost:hover {
-            border-color: var(--accent);
-            color: var(--accent2);
-        }
-
-        .btn-sm {
-            padding: 8px 14px;
-            font-size: 12px;
-        }
-
-        .btn-full {
-            width: 100%;
-            margin-top: 16px;
-        }
-
-        .btn-inspire {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            color: white;
-            width: 100%;
-            margin-bottom: 16px;
-        }
-
-        .btn-inspire:hover {
-            opacity: 0.9;
-        }
-
-        /* SEARCH */
-        .search-bar {
-            position: relative;
-            margin-bottom: 16px;
-        }
-
-        .search-bar input {
-            padding-left: 36px;
-        }
-
-        .search-bar::before {
-            content: '🔍';
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-        }
-
-        /* POST GENERATOR */
-        .generator-output {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-top: 16px;
-            display: none;
-        }
-
-        .generator-output.show {
-            display: block;
-        }
-
-        .generator-output h3 {
-            font-size: 14px;
-            margin-bottom: 12px;
-            color: var(--accent2);
-        }
-
-        .generated-post {
-            font-size: 15px;
-            line-height: 1.7;
-            white-space: pre-line;
-            padding: 16px;
-            background: var(--bg);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .gen-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        /* CALENDAR */
-        .cal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .cal-header h2 {
-            font-size: 16px;
-        }
-
-        .cal-nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        .cal-nav button {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .cal-day {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-
-        .cal-day-header {
-            padding: 10px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .cal-day-header.posting-day {
-            background: rgba(99, 102, 241, 0.08);
-        }
-
-        .cal-day-header .day-label {
-            color: var(--text);
-        }
-
-        .cal-day-header .day-date {
-            color: var(--text2);
-            font-weight: 400;
-        }
-
-        .cal-day-header .posting-badge {
-            background: var(--accent);
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .cal-day-content {
-            padding: 10px 14px;
-            border-top: 1px solid var(--border);
-            min-height: 50px;
-        }
-
-        .cal-post {
-            padding: 8px 12px;
-            background: var(--surface2);
-            border-radius: 8px;
-            border-left: 3px solid var(--accent);
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
-
-        .cal-post .cal-post-title {
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .cal-post .cal-post-status {
-            font-size: 11px;
-            color: var(--text2);
-            margin-top: 3px;
-        }
-
-        .cal-empty {
-            color: var(--text2);
-            font-size: 13px;
-            font-style: italic;
-        }
-
-        .today-marker {
-            border-color: var(--green) !important;
-        }
-
-        /* DASHBOARD */
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--accent2);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text2);
-            margin-top: 4px;
-        }
-
-        .pillar-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .pillar-bar:last-child {
-            border-bottom: none;
-        }
-
-        .pillar-name {
-            font-size: 13px;
-            width: 120px;
-            flex-shrink: 0;
-            color: var(--text2);
-        }
-
-        .pillar-fill {
-            flex: 1;
-            height: 8px;
-            background: var(--surface2);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .pillar-fill-inner {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-
-        .pillar-count {
-            font-size: 12px;
-            color: var(--text2);
-            width: 30px;
-            text-align: right;
-        }
-
-        .streak-display {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .streak-number {
-            font-size: 48px;
-        }
-
-        .streak-label {
-            font-size: 14px;
-            color: var(--text2);
-        }
-
-        /* EMPTY */
-        .empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text2);
-        }
-
-        .empty .icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-        }
-
-        /* FAB */
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-            transition: all 0.2s;
-            z-index: 50;
-            display: none;
-        }
-
-        .fab:hover {
-            transform: scale(1.1);
-        }
-
-        /* MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 480px;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .modal h3 {
-            margin-bottom: 16px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-buttons .btn {
-            flex: 1;
-        }
-
-        /* TOAST */
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--green);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 300;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-
-        @media (min-width: 768px) {
-            .tab-content {
-                max-width: 640px;
-                margin: 0 auto;
-            }
-
-            .page-header {
-                max-width: 640px;
-                margin: 0 auto;
-            }
-
-            .stat-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding-bottom: 80px; }
+        .header { background: linear-gradient(135deg, #25408F, #000759); color: white; padding: 20px 16px; position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header p { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+        .progress-bar { background: rgba(255,255,255,0.2); height: 6px; border-radius: 3px; margin-top: 12px; overflow: hidden; }
+        .progress-fill { background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s ease; }
+        .progress-text { font-size: 11px; margin-top: 6px; opacity: 0.9; }
+        .tabs { display: flex; background: white; border-bottom: 1px solid #e0e0e0; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 500; color: #666; border: none; background: none; cursor: pointer; }
+        .tab.active { color: #25408F; border-bottom: 2px solid #25408F; }
+        .content { padding: 16px; }
+        .section { background: white; border-radius: 12px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section-header { background: #f8f9fa; padding: 14px 16px; font-weight: 600; font-size: 14px; color: #25408F; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .section-count { background: #e8f0fc; color: #25408F; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+        .section-items { display: block; }
+        .section.collapsed .section-items { display: none; }
+        .item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s; }
+        .item:last-child { border-bottom: none; }
+        .item:active { background: #f5f5f5; }
+        .checkbox { width: 24px; height: 24px; border: 2px solid #ccc; border-radius: 6px; margin-right: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+        .item.checked .checkbox { background: #4CAF50; border-color: #4CAF50; }
+        .checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; opacity: 0; }
+        .item.checked .checkbox::after { opacity: 1; }
+        .item-text { flex: 1; font-size: 15px; color: #333; }
+        .item.checked .item-text { color: #999; text-decoration: line-through; }
+        .issue-btn { background: none; border: none; color: #ff9800; font-size: 20px; padding: 4px 8px; cursor: pointer; }
+        .inspector-input { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .inspector-input label { font-size: 12px; color: #666; display: block; margin-bottom: 6px; }
+        .inspector-input input, .inspector-input select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 10px; }
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 12px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; gap: 12px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: #25408F; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-export { background: #e8f0fc; color: #25408F; }
+        .history-item { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .history-date { font-weight: 600; color: #25408F; margin-bottom: 4px; }
+        .history-meta { font-size: 13px; color: #666; }
+        .history-issues { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 13px; color: #e65100; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { margin-bottom: 16px; color: #333; }
+        .modal textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; min-height: 100px; resize: none; }
+        .modal select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 12px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 16px; }
+        .export-options { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .export-btn { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+        .export-btn:hover { background: #e8f0fc; }
+        .export-btn .icon { font-size: 24px; }
+        .export-btn .text { flex: 1; }
+        .export-btn .title { font-weight: 600; color: #333; font-size: 15px; }
+        .export-btn .desc { font-size: 12px; color: #666; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .complete-banner { background: #4CAF50; color: white; padding: 16px; text-align: center; font-weight: 600; display: none; }
+        .complete-banner.show { display: block; }
+        .period-selector { margin-bottom: 16px; }
+        .period-selector label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; }
     </style>
 </head>
-
 <body>
-
-    <nav class="nav">
-        <div class="nav-item active" onclick="switchTab('swipe')"><span class="nav-icon">📋</span>Swipe File</div>
-        <div class="nav-item" onclick="switchTab('generator')"><span class="nav-icon">✍️</span>Generator</div>
-        <div class="nav-item" onclick="switchTab('calendar')"><span class="nav-icon">📅</span>Calendar</div>
-        <div class="nav-item" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
-    </nav>
-
-    <!-- ═══════ SWIPE FILE TAB ═══════ -->
-    <div id="tab-swipe" class="tab-content active">
-        <div class="page-header">
-            <h1>📋 Swipe File</h1>
-            <p>Top posts from property managers & PropTech creators</p>
-        </div>
-
-        <button class="btn btn-inspire" onclick="inspireMe()">🎲 Inspire Me — Show a Random Top Post</button>
-
-        <div class="add-form collapsed" id="addPostForm">
-            <div class="form-toggle" onclick="toggleAddForm()">
-                <h3>➕ Add New Post</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="form-body">
-                <label>Author Name</label>
-                <input type="text" id="swipeAuthor" placeholder="e.g. Elliot Gold">
-                <label>Author Title</label>
-                <input type="text" id="swipeAuthorTitle" placeholder="e.g. Co-Founder at Work.Life">
-                <label>Post Text</label>
-                <textarea id="swipeText" rows="6" placeholder="Paste the post content here..."></textarea>
-                <label>Source URL (optional)</label>
-                <input type="text" id="swipeUrl" placeholder="https://linkedin.com/...">
-                <div class="form-row">
-                    <div>
-                        <label>Content Pillar</label>
-                        <select id="swipePillar">
-                            <option value="AI in Daily PM Work">AI in Daily PM Work</option>
-                            <option value="PropFlow AI">PropFlow AI</option>
-                            <option value="Practical Tools">Practical Tools & Tips</option>
-                            <option value="Industry Insights">Industry Insights</option>
-                            <option value="Behind the Scenes">Behind the Scenes</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Engagement</label>
-                        <select id="swipeEngagement">
-                            <option value="high">🔥 High</option>
-                            <option value="medium">👍 Medium</option>
-                            <option value="low">📝 Low</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn btn-accent btn-full" onclick="addSwipePost()">Save to Swipe File</button>
-            </div>
-        </div>
-
-        <div class="search-bar">
-            <input type="text" id="swipeSearch" placeholder="Search posts..." oninput="renderSwipeFile()">
-        </div>
-
-        <div id="swipeList"></div>
+    <div class="header">
+        <h1>InDi Daily Walkthrough</h1>
+        <p>Uriekstes iela 2A, Rīga</p>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text"><span id="progressText">0 / 0</span> items completed</div>
     </div>
-
-    <!-- ═══════ GENERATOR TAB ═══════ -->
-    <div id="tab-generator" class="tab-content">
-        <div class="page-header">
-            <h1>✍️ Post Generator</h1>
-            <p>Draft posts in your voice — direct, practical, no hype</p>
-        </div>
-
-        <div class="card">
-            <div class="form-row">
-                <div>
-                    <label>Content Pillar</label>
-                    <select id="genPillar">
-                        <option value="AI in Daily PM Work">AI in Daily PM Work (40%)</option>
-                        <option value="PropFlow AI">PropFlow AI (20%)</option>
-                        <option value="Practical Tools">Practical Tools & Tips (20%)</option>
-                        <option value="Industry Insights">Industry Insights (10%)</option>
-                        <option value="Behind the Scenes">Behind the Scenes (10%)</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Post Type</label>
-                    <select id="genType">
-                        <option value="story">📖 Story</option>
-                        <option value="tip">💡 Tip / How-to</option>
-                        <option value="question">❓ Question</option>
-                        <option value="casestudy">📊 Case Study</option>
-                        <option value="lesson">🎓 Lesson Learned</option>
-                    </select>
-                </div>
-            </div>
-
-            <label>Hook — What happened? (1 sentence that grabs attention)</label>
-            <input type="text" id="genHook"
-                placeholder="e.g. I used Claude to draft a compliance letter. It took 10 minutes.">
-
-            <label>Body — What did you do? (2-3 sentences)</label>
-            <textarea id="genBody" rows="3"
-                placeholder="e.g. Our VVD compliance deadline was Friday. I uploaded the previous report and asked Claude to update with current data..."></textarea>
-
-            <label>Result — What did you learn? (1-2 sentences)</label>
-            <textarea id="genResult" rows="2"
-                placeholder="e.g. The letter was ready in 10 minutes. Normally this takes 2 hours."></textarea>
-
-            <label>Takeaway — What should the reader do? (1 sentence or question)</label>
-            <input type="text" id="genTakeaway" placeholder="e.g. What repetitive task could you hand to AI this week?">
-
-            <button class="btn btn-accent btn-full" onclick="generatePost()">⚡ Generate Post</button>
-        </div>
-
-        <div class="generator-output" id="genOutput">
-            <h3>📝 Your Draft</h3>
-            <div class="generated-post" id="genPreview"></div>
-            <div class="gen-actions">
-                <button class="btn btn-accent btn-sm" onclick="copyPost()">📋 Copy</button>
-                <button class="btn btn-ghost btn-sm" onclick="saveDraft()">💾 Save Draft</button>
-                <button class="btn btn-ghost btn-sm" onclick="editDraft()">✏️ Edit</button>
-            </div>
-        </div>
-
-        <!-- Drafts List -->
-        <div style="margin-top: 20px;">
-            <h3 style="font-size: 16px; margin-bottom: 12px;">💾 Saved Drafts</h3>
-            <div id="draftsList"></div>
-        </div>
+    <div class="complete-banner" id="completeBanner">✓ Walkthrough Complete!</div>
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('checklist')">Checklist</button>
+        <button class="tab" onclick="showTab('history')">History</button>
     </div>
-
-    <!-- ═══════ CALENDAR TAB ═══════ -->
-    <div id="tab-calendar" class="tab-content">
-        <div class="page-header">
-            <h1>📅 Content Calendar</h1>
-            <p>Mon / Wed / Fri posting schedule</p>
-        </div>
-        <div class="cal-header">
-            <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">← Prev</button>
-            <h2 id="calWeekLabel"></h2>
-            <button class="btn btn-ghost btn-sm" onclick="calNav(1)">Next →</button>
-        </div>
-        <div id="calendarView"></div>
+    <div id="checklistTab" class="content"></div>
+    <div id="historyTab" class="content" style="display:none;"></div>
+    <div class="bottom-bar">
+        <button class="btn btn-secondary" onclick="resetChecklist()">Reset</button>
+        <button class="btn btn-export" onclick="openExportModal()">Export</button>
+        <button class="btn btn-primary" onclick="saveWalkthrough()">Save</button>
     </div>
-
-    <!-- ═══════ DASHBOARD TAB ═══════ -->
-    <div id="tab-dashboard" class="tab-content">
-        <div class="page-header">
-            <h1>📊 Dashboard</h1>
-            <p>Your content stats at a glance</p>
-        </div>
-        <div class="stat-grid" id="statsGrid"></div>
-        <div class="card" style="margin-top: 16px;">
-            <h3 style="font-size: 14px; margin-bottom: 12px;">Pillar Distribution</h3>
-            <div id="pillarChart"></div>
-        </div>
-        <div class="card" style="margin-top: 12px;">
-            <h3 style="font-size: 14px; margin-bottom: 8px;">🔥 Posting Streak</h3>
-            <div id="streakDisplay"></div>
-        </div>
-    </div>
-
-    <!-- ASSIGN MODAL -->
-    <div class="modal" id="assignModal">
+    <div class="modal" id="issueModal">
         <div class="modal-content">
-            <h3>Assign Draft to <span id="assignDateLabel"></span></h3>
-            <div id="assignDraftList"></div>
+            <h3>Report Issue</h3>
+            <p style="font-size:14px;color:#666;margin-bottom:12px;" id="issueItemName"></p>
+            <textarea id="issueNote" placeholder="Describe the issue..."></textarea>
             <div class="modal-buttons">
-                <button class="btn btn-ghost" onclick="closeModal('assignModal')">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal('issueModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveIssue()">Save Issue</button>
             </div>
         </div>
     </div>
-
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
-
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h3>Export Report</h3>
+            <div class="period-selector">
+                <label>Select Period</label>
+                <select id="exportPeriod">
+                    <option value="today">Today only</option>
+                    <option value="week">Last 7 days</option>
+                    <option value="month" selected>Last 30 days</option>
+                    <option value="3months">Last 3 months</option>
+                    <option value="6months">Last 6 months</option>
+                    <option value="all">All history</option>
+                </select>
+            </div>
+            <div class="period-selector">
+                <label>What to export</label>
+                <select id="exportContent">
+                    <option value="all" selected>Full report (all items)</option>
+                    <option value="issues">Issues only</option>
+                    <option value="summary">Summary only</option>
+                </select>
+            </div>
+            <div class="export-options">
+                <div class="export-btn" onclick="exportExcel()">
+                    <span class="icon">📊</span>
+                    <div class="text"><div class="title">Export Excel</div><div class="desc">Download .xlsx file</div></div>
+                </div>
+                <div class="export-btn" onclick="exportPDF()">
+                    <span class="icon">📄</span>
+                    <div class="text"><div class="title">Export PDF</div><div class="desc">Download .pdf file</div></div>
+                </div>
+                <div class="export-btn" onclick="exportEmail()">
+                    <span class="icon">📧</span>
+                    <div class="text"><div class="title">Send via Email</div><div class="desc">Open in mail app</div></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('exportModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
     <script>
-        // ═══════════════════════════════════════════
-        // DATA STORE
-        // ═══════════════════════════════════════════
-        const STORAGE_KEYS = { swipe: 'li_engine_swipe', drafts: 'li_engine_drafts', calendar: 'li_engine_calendar', posted: 'li_engine_posted' };
-
-        function load(key) { return JSON.parse(localStorage.getItem(STORAGE_KEYS[key]) || '[]'); }
-        function save(key, data) { localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(data)); }
-
-        // SEED DATA — Pre-loaded swipe file from LinkedIn research
-        const SEED_POSTS = [
-            {
-                id: 's1', author: 'Elliot Gold', title: 'Co-Founder at Work.Life',
-                text: 'AI is shifting from "assisting people" to "supporting systems" in property management.\n\nThis matters because:\n→ Coordination costs are falling\n→ Decisions driven by workflows, not inboxes\n→ Finance & compliance becoming basic infrastructure\n\nTeams can now scale portfolios without scaling headcount. The bottleneck isn\'t people anymore — it\'s how well your systems talk to each other.',
-                url: 'https://www.linkedin.com/posts/goldelliot_propertymanagement-proptech-artificialintelligence-activity-7411467596782256128-Luu6',
-                pillar: 'AI in Daily PM Work', engagement: 'high', date: '2026-03-10'
-            },
-            {
-                id: 's2', author: 'Matt Benton', title: 'PropTech Strategist',
-                text: 'Three PropTech challenges I\'m watching heading into 2026:\n\n1. Tenants will no longer accept "that\'s just how property management is" as an excuse for poor tech.\n2. Owners must be comfortable with constant change.\n3. Seamless integration isn\'t optional anymore — it\'s minimum expectation.\n\nThe bar for technology in buildings has moved permanently.',
-                url: 'https://www.linkedin.com/posts/matt-benton-110b5965_three-proptech-challenges-im-watching-heading-activity-7406966606808952832-UW8G',
-                pillar: 'Industry Insights', engagement: 'high', date: '2026-03-08'
-            },
-            {
-                id: 's3', author: 'Sarah Mitchell', title: 'Facilities Management Consultant',
-                text: 'The numbers are in on AI in maintenance scheduling:\n\n→ 15-25% annual cost reductions\n→ Fewer emergency callouts\n→ Better tenant satisfaction scores\n\nAI isn\'t just a trend — it\'s a measurable financial advantage. If you\'re still doing reactive maintenance, you\'re leaving money on the table.',
-                url: 'https://www.linkedin.com/pulse/proptech-facilities-management-2026-industry-outlook-sarah-mitchell-9ubnf',
-                pillar: 'AI in Daily PM Work', engagement: 'high', date: '2026-03-05'
-            },
-            {
-                id: 's4', author: 'Wolfgang Croskey', title: 'Property Management Advisor',
-                text: 'AI in property management: the future isn\'t coming — it\'s already here.\n\nI\'m seeing property managers use AI to:\n- Draft tenant communications in seconds\n- Auto-categorize maintenance requests\n- Generate compliance reports\n- Predict HVAC failures before they happen\n\nThe question isn\'t "should we adopt AI?" It\'s "how far behind are we?"',
-                url: 'https://www.linkedin.com/pulse/ai-property-management-future-isnt-comingits-already-here-croskey-ymksc',
-                pillar: 'Practical Tools', engagement: 'medium', date: '2026-02-28'
-            },
-            {
-                id: 's5', author: 'Bay Property Management Group', title: 'Property Management Company',
-                text: 'In 2026, property management goes beyond collecting rent and fixing leaks.\n\nThe best-performing firms are using tech for:\n✓ Automated lease renewal workflows\n✓ Real-time building performance dashboards\n✓ Predictive maintenance scheduling\n✓ Digital tenant portals\n\nThe industry is bifurcating: tech-forward vs. traditional. Which side are you on?',
-                url: 'https://www.linkedin.com/pulse/proptech-power-streamlining-property-management-2026-dqwwe',
-                pillar: 'Industry Insights', engagement: 'medium', date: '2026-02-25'
-            },
-            {
-                id: 's6', author: 'Sperlonga Data & Analytics', title: 'Data Analytics for Real Estate',
-                text: 'Even with all the AI in the world, the ability to listen and empathize is what separates good property managers from the rest.\n\nTechnology handles the data.\nPeople handle the relationships.\n\nDon\'t forget: protecting ownership\'s investment requires both.',
-                url: 'https://www.linkedin.com/posts/sperlongadata_looking-ahead-three-trends-that-will-define-activity-7394763282148012032-1btK',
-                pillar: 'Behind the Scenes', engagement: 'medium', date: '2026-02-20'
-            }
+        const CHECKLIST = [
+            { name: "Entrances & Lobby", items: ["Main entrance doors functioning","Access control / intercom working","Lobby clean, no debris","Floor mats in place, clean","Lighting working","Signage visible, undamaged"] },
+            { name: "Common Area WCs", items: ["Toilets functioning","No odours","Soap dispensers filled","Paper towels / toilet paper stocked","Floors clean, dry","Air fresheners working","No leaks or drips"] },
+            { name: "Stairwells & Corridors", items: ["Lighting working","Handrails secure","Floors clean, no hazards","Fire doors closing properly","Emergency exit signs lit"] },
+            { name: "Elevators", items: ["Operating normally","Interior clean","Lighting working","Buttons/display functioning","No unusual sounds"] },
+            { name: "Roof", items: ["Access door secured","No visible membrane damage","Drains clear, no ponding water","No debris or loose objects","Lightning protection intact"] },
+            { name: "Parking & Exterior", items: ["Parking area clean, no debris","No potholes / puddles","Lighting working","Snow/ice cleared (winter)","Waste containers not overflowing","Perimeter fencing intact"] },
+            { name: "Technical Rooms", items: ["No water leaks","No unusual sounds/smells","Temperature normal","Access secured"] },
+            { name: "General", items: ["All building systems operating normally","No tenant complaints received"] }
         ];
-
-        // Initialize seed data if first run
-        function initSeedData() {
-            const swipe = load('swipe');
-            if (swipe.length === 0) { save('swipe', SEED_POSTS); }
+        let state = { checked: {}, issues: {}, inspector: '' };
+        let currentIssueKey = null;
+        function init() { loadState(); renderChecklist(); renderHistory(); updateProgress(); }
+        function loadState() {
+            const saved = localStorage.getItem('indi_walkthrough_state');
+            if (saved) { const parsed = JSON.parse(saved); const today = new Date().toDateString(); if (parsed.date !== today) { state = { checked: {}, issues: {}, inspector: parsed.inspector || '' }; } else { state = parsed; } }
         }
-
-        // ═══════════════════════════════════════════
-        // VOICE CONFIG (from linkedin-voice.md)
-        // ═══════════════════════════════════════════
-        const VOICE = {
-            hashtags: {
-                'AI in Daily PM Work': '#PropertyManagement #AIinRealEstate #PropTech #FacilityManagement',
-                'PropFlow AI': '#PropFlowAI #PropertyManagement #PowerAutomate #MicrosoftAI #PropTech',
-                'Practical Tools': '#PropertyManagement #PropTech #BuildingManagement #FacilityManagement',
-                'Industry Insights': '#RealEstate #PropertyManagement #Latvia #Baltics #PropTech',
-                'Behind the Scenes': '#PropertyManagement #RealEstate #Latvia #PropTech'
-            }
-        };
-
-        // ═══════════════════════════════════════════
-        // TAB SWITCHING
-        // ═══════════════════════════════════════════
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if (tab === 'calendar') renderCalendar();
-            if (tab === 'dashboard') renderDashboard();
-            if (tab === 'swipe') renderSwipeFile();
-            if (tab === 'generator') renderDrafts();
-        }
-
-        // ═══════════════════════════════════════════
-        // SWIPE FILE
-        // ═══════════════════════════════════════════
-        function toggleAddForm() {
-            const form = document.getElementById('addPostForm');
-            form.classList.toggle('collapsed');
-        }
-
-        function addSwipePost() {
-            const post = {
-                id: 'p' + Date.now(),
-                author: document.getElementById('swipeAuthor').value.trim(),
-                title: document.getElementById('swipeAuthorTitle').value.trim(),
-                text: document.getElementById('swipeText').value.trim(),
-                url: document.getElementById('swipeUrl').value.trim(),
-                pillar: document.getElementById('swipePillar').value,
-                engagement: document.getElementById('swipeEngagement').value,
-                date: new Date().toISOString().split('T')[0]
-            };
-            if (!post.text) { showToast('⚠️ Post text is required'); return; }
-            const swipe = load('swipe');
-            swipe.unshift(post);
-            save('swipe', swipe);
-            // Reset form
-            document.getElementById('swipeAuthor').value = '';
-            document.getElementById('swipeAuthorTitle').value = '';
-            document.getElementById('swipeText').value = '';
-            document.getElementById('swipeUrl').value = '';
-            document.getElementById('addPostForm').classList.add('collapsed');
-            showToast('✅ Post saved to swipe file');
-            renderSwipeFile();
-        }
-
-        function deleteSwipePost(id) {
-            if (!confirm('Remove this post?')) return;
-            let swipe = load('swipe');
-            swipe = swipe.filter(p => p.id !== id);
-            save('swipe', swipe);
-            renderSwipeFile();
-            showToast('Removed');
-        }
-
-        function inspireMe() {
-            const swipe = load('swipe');
-            const highPosts = swipe.filter(p => p.engagement === 'high');
-            const pool = highPosts.length > 0 ? highPosts : swipe;
-            if (pool.length === 0) { showToast('No posts in swipe file yet'); return; }
-            const random = pool[Math.floor(Math.random() * pool.length)];
-            // Scroll to that post and highlight it
-            renderSwipeFile();
-            setTimeout(() => {
-                const el = document.getElementById(`swipe-${random.id}`);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.style.borderColor = '#f59e0b';
-                    el.style.boxShadow = '0 0 20px rgba(245,158,11,0.2)';
-                    setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 3000);
-                }
-            }, 100);
-        }
-
-        function renderSwipeFile() {
-            const container = document.getElementById('swipeList');
-            const swipe = load('swipe');
-            const search = (document.getElementById('swipeSearch')?.value || '').toLowerCase();
-            const filtered = swipe.filter(p =>
-                !search ||
-                p.text.toLowerCase().includes(search) ||
-                p.author.toLowerCase().includes(search) ||
-                p.pillar.toLowerCase().includes(search)
-            );
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty"><div class="icon">📋</div><p>No posts yet. Add posts or ask your AI to browse LinkedIn for you.</p></div>`;
-                return;
-            }
-            container.innerHTML = filtered.map(p => `
-        <div class="card swipe-card" id="swipe-${p.id}">
-            <div class="swipe-author">${esc(p.author)}</div>
-            <div class="swipe-title">${esc(p.title)}</div>
-            <div class="swipe-text collapsed" id="text-${p.id}" onclick="this.classList.toggle('collapsed')">${esc(p.text)}</div>
-            <div class="swipe-meta">
-                <span class="tag tag-pillar">${esc(p.pillar)}</span>
-                <span class="tag tag-engagement-${p.engagement}">${p.engagement === 'high' ? '🔥 High' : p.engagement === 'medium' ? '👍 Medium' : '📝 Low'}</span>
-            </div>
-            ${p.url ? `<a class="swipe-link" href="${esc(p.url)}" target="_blank">View original →</a>` : ''}
-            <div class="swipe-actions">
-                <button onclick="useAsInspiration('${p.id}')">✍️ Use as Inspiration</button>
-                <button onclick="deleteSwipePost('${p.id}')">🗑️ Remove</button>
-            </div>
-        </div>
-    `).join('');
-        }
-
-        function useAsInspiration(id) {
-            const swipe = load('swipe');
-            const post = swipe.find(p => p.id === id);
-            if (!post) return;
-            switchTabDirect('generator');
-            document.getElementById('genPillar').value = post.pillar || 'AI in Daily PM Work';
-            showToast('📝 Post loaded — now write your version!');
-        }
-
-        function switchTabDirect(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.querySelectorAll('.nav-item')[['swipe', 'generator', 'calendar', 'dashboard'].indexOf(tab)].classList.add('active');
-            if (tab === 'generator') renderDrafts();
-        }
-
-        // ═══════════════════════════════════════════
-        // POST GENERATOR
-        // ═══════════════════════════════════════════
-        let currentGeneratedPost = '';
-
-        function generatePost() {
-            const hook = document.getElementById('genHook').value.trim();
-            const body = document.getElementById('genBody').value.trim();
-            const result = document.getElementById('genResult').value.trim();
-            const takeaway = document.getElementById('genTakeaway').value.trim();
-            const pillar = document.getElementById('genPillar').value;
-
-            if (!hook) { showToast('⚠️ Add a hook first'); return; }
-
-            const hashtags = VOICE.hashtags[pillar] || '#PropertyManagement #PropTech #AIinRealEstate';
-
-            let post = hook;
-            if (body) post += '\n\n' + body;
-            if (result) post += '\n\n' + result;
-            if (takeaway) post += '\n\n' + takeaway;
-            post += '\n\n' + hashtags;
-
-            currentGeneratedPost = post;
-            document.getElementById('genPreview').textContent = post;
-            document.getElementById('genOutput').classList.add('show');
-            document.getElementById('genOutput').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function copyPost() {
-            navigator.clipboard.writeText(currentGeneratedPost).then(() => {
-                showToast('📋 Copied to clipboard!');
-            }).catch(() => {
-                // Fallback
-                const ta = document.createElement('textarea');
-                ta.value = currentGeneratedPost;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                showToast('📋 Copied!');
-            });
-        }
-
-        function saveDraft() {
-            if (!currentGeneratedPost) return;
-            const pillar = document.getElementById('genPillar').value;
-            const type = document.getElementById('genType').value;
-            const hook = document.getElementById('genHook').value.trim();
-            const draft = {
-                id: 'd' + Date.now(),
-                text: currentGeneratedPost,
-                pillar: pillar,
-                type: type,
-                title: hook.substring(0, 60) + (hook.length > 60 ? '...' : ''),
-                date: new Date().toISOString(),
-                status: 'draft'
-            };
-            const drafts = load('drafts');
-            drafts.unshift(draft);
-            save('drafts', drafts);
-            showToast('💾 Draft saved!');
-            renderDrafts();
-        }
-
-        function editDraft() {
-            const preview = document.getElementById('genPreview');
-            preview.contentEditable = preview.contentEditable === 'true' ? 'false' : 'true';
-            preview.focus();
-            if (preview.contentEditable === 'true') {
-                preview.style.border = '2px solid var(--accent)';
-                showToast('Editing — click Edit again to finish');
-            } else {
-                preview.style.border = '';
-                currentGeneratedPost = preview.textContent;
-            }
-        }
-
-        function deleteDraft(id) {
-            let drafts = load('drafts');
-            drafts = drafts.filter(d => d.id !== id);
-            save('drafts', drafts);
-            renderDrafts();
-            showToast('Draft removed');
-        }
-
-        function copyDraft(id) {
-            const drafts = load('drafts');
-            const draft = drafts.find(d => d.id === id);
-            if (draft) {
-                navigator.clipboard.writeText(draft.text).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy failed'));
-            }
-        }
-
-        function markPosted(draftId) {
-            const drafts = load('drafts');
-            const draft = drafts.find(d => d.id === draftId);
-            if (draft) {
-                draft.status = 'posted';
-                draft.postedDate = new Date().toISOString();
-                save('drafts', drafts);
-                renderDrafts();
-                renderCalendar();
-                showToast('✅ Marked as posted!');
-            }
-        }
-
-        function renderDrafts() {
-            const container = document.getElementById('draftsList');
-            const drafts = load('drafts');
-            if (drafts.length === 0) {
-                container.innerHTML = `<div class="empty"><p>No drafts yet. Generate your first post above.</p></div>`;
-                return;
-            }
-            container.innerHTML = drafts.map(d => `
-        <div class="card" style="border-left: 3px solid ${d.status === 'posted' ? 'var(--green)' : 'var(--accent)'};">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:600; font-size:14px;">${esc(d.title)}</span>
-                <span class="tag ${d.status === 'posted' ? 'tag-engagement-low' : 'tag-pillar'}">${d.status === 'posted' ? '✅ Posted' : '📝 Draft'}</span>
-            </div>
-            <div style="font-size:12px; color:var(--text2); margin-top:4px;">${esc(d.pillar)} • ${new Date(d.date).toLocaleDateString()}</div>
-            <div class="swipe-actions">
-                <button onclick="copyDraft('${d.id}')">📋 Copy</button>
-                ${d.status !== 'posted' ? `<button onclick="markPosted('${d.id}')">✅ Mark Posted</button>` : ''}
-                <button onclick="deleteDraft('${d.id}')">🗑️</button>
-            </div>
-        </div>
-    `).join('');
-        }
-
-        // ═══════════════════════════════════════════
-        // CALENDAR
-        // ═══════════════════════════════════════════
-        let calWeekOffset = 0;
-        const POSTING_DAYS = [1, 3, 5]; // Mon, Wed, Fri
-
-        function calNav(dir) { calWeekOffset += dir; renderCalendar(); }
-
-        function getWeekDays(offset) {
-            const today = new Date();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() - today.getDay() + 1 + (offset * 7));
-            const days = [];
-            for (let i = 0; i < 7; i++) {
-                const d = new Date(monday);
-                d.setDate(monday.getDate() + i);
-                days.push(d);
-            }
-            return days;
-        }
-
-        function renderCalendar() {
-            const days = getWeekDays(calWeekOffset);
-            const today = new Date().toDateString();
-            const calData = JSON.parse(localStorage.getItem(STORAGE_KEYS.calendar) || '{}');
-            const drafts = load('drafts');
-
-            document.getElementById('calWeekLabel').textContent = `${days[0].toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — ${days[6].toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-
-            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            document.getElementById('calendarView').innerHTML = days.map((d, i) => {
-                const dateKey = d.toISOString().split('T')[0];
-                const isPostingDay = POSTING_DAYS.includes(d.getDay());
-                const isToday = d.toDateString() === today;
-                const assignedDraftId = calData[dateKey];
-                const assignedDraft = assignedDraftId ? drafts.find(dr => dr.id === assignedDraftId) : null;
-
-                return `
-            <div class="cal-day ${isToday ? 'today-marker' : ''}">
-                <div class="cal-day-header ${isPostingDay ? 'posting-day' : ''}">
-                    <span class="day-label">${dayNames[i]}</span>
-                    <span class="day-date">${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
-                    ${isPostingDay ? '<span class="posting-badge">POST DAY</span>' : ''}
-                </div>
-                <div class="cal-day-content">
-                    ${assignedDraft ?
-                        `<div class="cal-post">
-                            <div class="cal-post-title">${esc(assignedDraft.title)}</div>
-                            <div class="cal-post-status">${assignedDraft.status === 'posted' ? '✅ Posted' : '📝 Draft'}</div>
-                        </div>` :
-                        (isPostingDay ?
-                            `<button class="btn btn-ghost btn-sm" onclick="openAssignModal('${dateKey}')" style="width:100%;">+ Assign Draft</button>` :
-                            `<div class="cal-empty">—</div>`)
-                    }
-                </div>
-            </div>
-        `;
-            }).join('');
-        }
-
-        function openAssignModal(dateKey) {
-            const drafts = load('drafts').filter(d => d.status !== 'posted');
-            const modal = document.getElementById('assignModal');
-            const dateLabel = new Date(dateKey + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
-            document.getElementById('assignDateLabel').textContent = dateLabel;
-
-            if (drafts.length === 0) {
-                document.getElementById('assignDraftList').innerHTML = '<div class="empty"><p>No drafts available. Create one in the Generator tab.</p></div>';
-            } else {
-                document.getElementById('assignDraftList').innerHTML = drafts.map(d => `
-            <div class="card" style="cursor:pointer;" onclick="assignDraft('${dateKey}','${d.id}')">
-                <div style="font-weight:600; font-size:14px;">${esc(d.title)}</div>
-                <div style="font-size:12px; color:var(--text2);">${esc(d.pillar)} • ${new Date(d.date).toLocaleDateString()}</div>
-            </div>
-        `).join('');
-            }
-            modal.classList.add('show');
-        }
-
-        function assignDraft(dateKey, draftId) {
-            const calData = JSON.parse(localStorage.getItem(STORAGE_KEYS.calendar) || '{}');
-            calData[dateKey] = draftId;
-            localStorage.setItem(STORAGE_KEYS.calendar, JSON.stringify(calData));
-            closeModal('assignModal');
-            renderCalendar();
-            showToast('📅 Draft assigned!');
-        }
-
-        // ═══════════════════════════════════════════
-        // DASHBOARD
-        // ═══════════════════════════════════════════
-        function renderDashboard() {
-            const swipe = load('swipe');
-            const drafts = load('drafts');
-            const posted = drafts.filter(d => d.status === 'posted');
-            const thisMonth = drafts.filter(d => {
-                const dd = new Date(d.date);
-                const now = new Date();
-                return dd.getMonth() === now.getMonth() && dd.getFullYear() === now.getFullYear();
-            });
-
-            // Stats grid
-            document.getElementById('statsGrid').innerHTML = `
-        <div class="stat-card"><div class="stat-number">${swipe.length}</div><div class="stat-label">Swipe File Posts</div></div>
-        <div class="stat-card"><div class="stat-number">${drafts.length}</div><div class="stat-label">Total Drafts</div></div>
-        <div class="stat-card"><div class="stat-number">${posted.length}</div><div class="stat-label">Posts Published</div></div>
-        <div class="stat-card"><div class="stat-number">${thisMonth.length}</div><div class="stat-label">This Month</div></div>
-    `;
-
-            // Pillar chart
-            const pillars = ['AI in Daily PM Work', 'PropFlow AI', 'Practical Tools', 'Industry Insights', 'Behind the Scenes'];
-            const maxCount = Math.max(1, ...pillars.map(p => drafts.filter(d => d.pillar === p).length));
-            document.getElementById('pillarChart').innerHTML = pillars.map(p => {
-                const count = drafts.filter(d => d.pillar === p).length;
-                const pct = (count / maxCount * 100);
-                return `<div class="pillar-bar"><div class="pillar-name">${p}</div><div class="pillar-fill"><div class="pillar-fill-inner" style="width:${pct}%"></div></div><div class="pillar-count">${count}</div></div>`;
-            }).join('');
-
-            // Streak
-            const streak = calculateStreak(posted);
-            document.getElementById('streakDisplay').innerHTML = `
-        <div class="streak-display">
-            <div class="streak-number">${streak > 0 ? '🔥'.repeat(Math.min(streak, 5)) : '⬜'}</div>
-            <div class="stat-number">${streak}</div>
-            <div class="streak-label">consecutive weeks with 3+ posts</div>
-        </div>
-    `;
-        }
-
-        function calculateStreak(posted) {
-            if (posted.length < 3) return 0;
-            let streak = 0;
-            const now = new Date();
-            for (let w = 0; w < 52; w++) {
-                const weekStart = new Date(now);
-                weekStart.setDate(now.getDate() - now.getDay() + 1 - (w * 7));
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekStart.getDate() + 6);
-                const postsThisWeek = posted.filter(p => {
-                    const pd = new Date(p.postedDate || p.date);
-                    return pd >= weekStart && pd <= weekEnd;
+        function saveState() { state.date = new Date().toDateString(); localStorage.setItem('indi_walkthrough_state', JSON.stringify(state)); }
+        function renderChecklist() {
+            const container = document.getElementById('checklistTab');
+            let html = `<div class="inspector-input"><label>Inspector Name</label><input type="text" id="inspectorName" placeholder="Your name" value="${state.inspector}" onchange="updateInspector(this.value)"></div>`;
+            CHECKLIST.forEach((section, sIdx) => {
+                const checkedCount = section.items.filter((_, iIdx) => state.checked[`${sIdx}-${iIdx}`]).length;
+                html += `<div class="section" id="section-${sIdx}"><div class="section-header" onclick="toggleSection(${sIdx})"><span>${section.name}</span><span class="section-count">${checkedCount}/${section.items.length}</span></div><div class="section-items">`;
+                section.items.forEach((item, iIdx) => {
+                    const key = `${sIdx}-${iIdx}`; const isChecked = state.checked[key]; const hasIssue = state.issues[key];
+                    html += `<div class="item ${isChecked ? 'checked' : ''}" id="item-${key}"><div class="checkbox" onclick="toggleItem('${key}')"></div><span class="item-text" onclick="toggleItem('${key}')">${item}</span><button class="issue-btn" onclick="openIssue('${key}', '${item}')" style="color: ${hasIssue ? '#e65100' : '#ccc'}">${hasIssue ? '⚠' : '⚑'}</button></div>`;
                 });
-                if (postsThisWeek.length >= 3) streak++;
-                else break;
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+        function toggleSection(idx) { document.getElementById(`section-${idx}`).classList.toggle('collapsed'); }
+        function toggleItem(key) { state.checked[key] = !state.checked[key]; saveState(); renderChecklist(); updateProgress(); }
+        function updateInspector(name) { state.inspector = name; saveState(); }
+        function updateProgress() {
+            let total = 0, checked = 0;
+            CHECKLIST.forEach((section, sIdx) => { section.items.forEach((_, iIdx) => { total++; if (state.checked[`${sIdx}-${iIdx}`]) checked++; }); });
+            const pct = total > 0 ? (checked / total * 100) : 0;
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressText').textContent = `${checked} / ${total}`;
+            document.getElementById('completeBanner').classList.toggle('show', checked === total && total > 0);
+        }
+        function openIssue(key, itemName) { currentIssueKey = key; document.getElementById('issueItemName').textContent = itemName; document.getElementById('issueNote').value = state.issues[key] || ''; document.getElementById('issueModal').classList.add('show'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('show'); if (modalId === 'issueModal') currentIssueKey = null; }
+        function saveIssue() { const note = document.getElementById('issueNote').value.trim(); if (note) { state.issues[currentIssueKey] = note; } else { delete state.issues[currentIssueKey]; } saveState(); renderChecklist(); closeModal('issueModal'); }
+        function resetChecklist() { if (confirm('Reset all checkboxes?')) { state.checked = {}; state.issues = {}; saveState(); renderChecklist(); updateProgress(); } }
+        function saveWalkthrough() {
+            let total = 0, checked = 0;
+            CHECKLIST.forEach((section, sIdx) => { section.items.forEach((_, iIdx) => { total++; if (state.checked[`${sIdx}-${iIdx}`]) checked++; }); });
+            const record = { date: new Date().toISOString(), inspector: state.inspector, completed: checked, total: total, issues: { ...state.issues }, checkedItems: { ...state.checked } };
+            let history = JSON.parse(localStorage.getItem('indi_walkthrough_history') || '[]');
+            history.unshift(record); history = history.slice(0, 90);
+            localStorage.setItem('indi_walkthrough_history', JSON.stringify(history));
+            state.checked = {}; state.issues = {}; saveState(); renderChecklist(); renderHistory(); updateProgress();
+            alert('Walkthrough saved!');
+        }
+        function renderHistory() {
+            const container = document.getElementById('historyTab');
+            const history = JSON.parse(localStorage.getItem('indi_walkthrough_history') || '[]');
+            if (history.length === 0) { container.innerHTML = `<div class="empty-state"><p>No completed walkthroughs yet</p></div>`; return; }
+            let html = '';
+            history.forEach(record => {
+                const date = new Date(record.date);
+                const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                const issueCount = Object.keys(record.issues || {}).length;
+                html += `<div class="history-item"><div class="history-date">${dateStr}</div><div class="history-meta">${timeStr} • ${record.inspector || 'Unknown'} • ${record.completed}/${record.total} items</div>${issueCount > 0 ? `<div class="history-issues">⚠ ${issueCount} issue${issueCount > 1 ? 's' : ''} reported</div>` : ''}</div>`;
+            });
+            container.innerHTML = html;
+        }
+        function showTab(tab) { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); document.getElementById('checklistTab').style.display = tab === 'checklist' ? 'block' : 'none'; document.getElementById('historyTab').style.display = tab === 'history' ? 'block' : 'none'; }
+        function openExportModal() { document.getElementById('exportModal').classList.add('show'); }
+        function getFilteredHistory() {
+            const period = document.getElementById('exportPeriod').value;
+            const history = JSON.parse(localStorage.getItem('indi_walkthrough_history') || '[]');
+            const now = new Date(); let cutoffDate = new Date(0);
+            switch(period) {
+                case 'today': cutoffDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()); break;
+                case 'week': cutoffDate = new Date(now - 7 * 24 * 60 * 60 * 1000); break;
+                case 'month': cutoffDate = new Date(now - 30 * 24 * 60 * 60 * 1000); break;
+                case '3months': cutoffDate = new Date(now - 90 * 24 * 60 * 60 * 1000); break;
+                case '6months': cutoffDate = new Date(now - 180 * 24 * 60 * 60 * 1000); break;
+                case 'all': default: cutoffDate = new Date(0);
             }
-            return streak;
+            return history.filter(r => new Date(r.date) >= cutoffDate);
         }
-
-        // ═══════════════════════════════════════════
-        // UTILS
-        // ═══════════════════════════════════════════
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
+        function getItemName(key) { const [sIdx, iIdx] = key.split('-').map(Number); if (CHECKLIST[sIdx] && CHECKLIST[sIdx].items[iIdx]) { return { zone: CHECKLIST[sIdx].name, item: CHECKLIST[sIdx].items[iIdx] }; } return { zone: 'Unknown', item: key }; }
+        function exportExcel() {
+            const history = getFilteredHistory();
+            const contentType = document.getElementById('exportContent').value;
+            if (history.length === 0) { alert('No data to export for selected period'); return; }
+            const wb = XLSX.utils.book_new();
+            const summaryData = [['Date', 'Time', 'Inspector', 'Completed', 'Total', 'Completion %', 'Issues Count']];
+            history.forEach(r => { const d = new Date(r.date); const pct = ((r.completed / r.total) * 100).toFixed(1) + '%'; summaryData.push([d.toLocaleDateString(), d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}), r.inspector || 'Unknown', r.completed, r.total, pct, Object.keys(r.issues || {}).length]); });
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+            wsSummary['!cols'] = [{wch:12},{wch:8},{wch:15},{wch:10},{wch:6},{wch:12},{wch:12}];
+            if (contentType === 'summary') { XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary'); }
+            else if (contentType === 'issues') {
+                const issuesData = [['Date', 'Time', 'Inspector', 'Zone', 'Item', 'Issue Description']];
+                history.forEach(r => { const d = new Date(r.date); const dateStr = d.toLocaleDateString(); const timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}); Object.entries(r.issues || {}).forEach(([key, issue]) => { const { zone, item } = getItemName(key); issuesData.push([dateStr, timeStr, r.inspector || 'Unknown', zone, item, issue]); }); });
+                const wsIssues = XLSX.utils.aoa_to_sheet(issuesData);
+                wsIssues['!cols'] = [{wch:12},{wch:8},{wch:15},{wch:20},{wch:35},{wch:50}];
+                XLSX.utils.book_append_sheet(wb, wsIssues, 'Issues');
+            } else {
+                XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+                const issuesData = [['Date', 'Time', 'Inspector', 'Zone', 'Item', 'Issue Description']];
+                history.forEach(r => { const d = new Date(r.date); const dateStr = d.toLocaleDateString(); const timeStr = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}); Object.entries(r.issues || {}).forEach(([key, issue]) => { const { zone, item } = getItemName(key); issuesData.push([dateStr, timeStr, r.inspector || 'Unknown', zone, item, issue]); }); });
+                if (issuesData.length > 1) { const wsIssues = XLSX.utils.aoa_to_sheet(issuesData); wsIssues['!cols'] = [{wch:12},{wch:8},{wch:15},{wch:20},{wch:35},{wch:50}]; XLSX.utils.book_append_sheet(wb, wsIssues, 'Issues'); }
+            }
+            XLSX.writeFile(wb, `InDi_Walkthrough_${new Date().toISOString().split('T')[0]}.xlsx`);
+            closeModal('exportModal');
         }
-
-        function esc(str) {
-            if (!str) return '';
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
+        function exportPDF() {
+            const history = getFilteredHistory();
+            const contentType = document.getElementById('exportContent').value;
+            if (history.length === 0) { alert('No data to export for selected period'); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const totalWalkthroughs = history.length;
+            const totalIssues = history.reduce((sum, r) => sum + Object.keys(r.issues || {}).length, 0);
+            const avgCompletion = (history.reduce((sum, r) => sum + (r.completed / r.total), 0) / history.length * 100).toFixed(1);
+            const periodText = document.getElementById('exportPeriod').selectedOptions[0].text;
+            doc.setFontSize(20); doc.setTextColor(37, 64, 143); doc.text('InDi Daily Walkthrough Report', 14, 20);
+            doc.setFontSize(10); doc.setTextColor(100); doc.text(`Property: Uriekstes iela 2A, Rīga`, 14, 28); doc.text(`Period: ${periodText}`, 14, 34); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 40);
+            doc.setFillColor(232, 240, 252); doc.rect(14, 45, 182, 15, 'F'); doc.setFontSize(10); doc.setTextColor(37, 64, 143); doc.text(`Summary: ${totalWalkthroughs} walkthrough(s) | ${totalIssues} issue(s) reported | ${avgCompletion}% avg completion`, 18, 54);
+            let yPos = 70;
+            if (contentType === 'summary' || contentType === 'all') {
+                doc.setFontSize(14); doc.setTextColor(37, 64, 143); doc.text('Walkthrough History', 14, yPos); yPos += 5;
+                const tableData = history.map(r => { const d = new Date(r.date); const issueCount = Object.keys(r.issues || {}).length; return [d.toLocaleDateString(), d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}), r.inspector || 'Unknown', `${r.completed}/${r.total}`, issueCount > 0 ? `⚠ ${issueCount}` : '✓']; });
+                doc.autoTable({ startY: yPos, head: [['Date', 'Time', 'Inspector', 'Completed', 'Issues']], body: tableData, theme: 'grid', headStyles: { fillColor: [37, 64, 143] }, styles: { fontSize: 9 } });
+                yPos = doc.lastAutoTable.finalY + 15;
+            }
+            if (contentType === 'issues' || contentType === 'all') {
+                const allIssues = [];
+                history.forEach(r => { Object.entries(r.issues || {}).forEach(([key, issue]) => { const { zone, item } = getItemName(key); allIssues.push({ date: new Date(r.date).toLocaleDateString(), inspector: r.inspector || 'Unknown', zone: zone, item: item, issue: issue }); }); });
+                if (allIssues.length > 0) {
+                    if (yPos > 250) { doc.addPage(); yPos = 20; }
+                    doc.setFontSize(14); doc.setTextColor(37, 64, 143); doc.text('Issues Reported', 14, yPos); yPos += 5;
+                    const issueData = allIssues.map(i => [i.date, i.inspector, i.zone, i.item, i.issue]);
+                    doc.autoTable({ startY: yPos, head: [['Date', 'Inspector', 'Zone', 'Item', 'Issue']], body: issueData, theme: 'grid', headStyles: { fillColor: [37, 64, 143] }, styles: { fontSize: 8 }, columnStyles: { 4: { cellWidth: 50 } } });
+                }
+            }
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text('Generated by InDi Daily Walkthrough App | Colliers Latvia', 14, 287); doc.text(`Page ${i} of ${pageCount}`, 180, 287); }
+            doc.save(`InDi_Walkthrough_${new Date().toISOString().split('T')[0]}.pdf`);
+            closeModal('exportModal');
         }
-
-        // ═══════════════════════════════════════════
-        // INIT
-        // ═══════════════════════════════════════════
-        initSeedData();
-        renderSwipeFile();
-        renderDrafts();
+        function exportEmail() {
+            const history = getFilteredHistory();
+            const contentType = document.getElementById('exportContent').value;
+            if (history.length === 0) { alert('No data to export for selected period'); return; }
+            const periodText = document.getElementById('exportPeriod').selectedOptions[0].text;
+            const totalWalkthroughs = history.length;
+            const totalIssues = history.reduce((sum, r) => sum + Object.keys(r.issues || {}).length, 0);
+            const avgCompletion = (history.reduce((sum, r) => sum + (r.completed / r.total), 0) / history.length * 100).toFixed(1);
+            let body = `InDi Daily Walkthrough Report\nProperty: Uriekstes iela 2A, Rīga\nPeriod: ${periodText}\nGenerated: ${new Date().toLocaleString()}\n\n═══════════════════════════════\nSUMMARY\n═══════════════════════════════\nTotal walkthroughs: ${totalWalkthroughs}\nIssues reported: ${totalIssues}\nAverage completion: ${avgCompletion}%\n\n`;
+            if (contentType === 'summary' || contentType === 'all') {
+                body += `═══════════════════════════════\nWALKTHROUGH HISTORY\n═══════════════════════════════\n`;
+                history.forEach(r => { const d = new Date(r.date); const issueCount = Object.keys(r.issues || {}).length; body += `${d.toLocaleDateString()} ${d.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})} | ${r.inspector || 'Unknown'} | ${r.completed}/${r.total} | ${issueCount > 0 ? '⚠ ' + issueCount + ' issues' : '✓ OK'}\n`; });
+                body += '\n';
+            }
+            if (contentType === 'issues' || contentType === 'all') {
+                const allIssues = [];
+                history.forEach(r => { Object.entries(r.issues || {}).forEach(([key, issue]) => { const { zone, item } = getItemName(key); allIssues.push({ date: new Date(r.date), inspector: r.inspector, zone: zone, item: item, issue: issue }); }); });
+                if (allIssues.length > 0) {
+                    body += `═══════════════════════════════\nISSUES REPORTED\n═══════════════════════════════\n`;
+                    allIssues.forEach(i => { body += `\n${i.date.toLocaleDateString()} - ${i.inspector || 'Unknown'}\nZone: ${i.zone}\nItem: ${i.item}\nIssue: ${i.issue}\n`; });
+                }
+            }
+            body += `\n───────────────────────────────\nSent from InDi Daily Walkthrough App\n`;
+            const subject = `InDi Walkthrough Report - ${periodText}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            closeModal('exportModal');
+        }
+        init();
     </script>
-
 </body>
-
 </html>
