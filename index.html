@@ -315,7 +315,11 @@
 
         function saveState() {
             state.date = new Date().toDateString();
-            localStorage.setItem(stateKey(), JSON.stringify(state));
+            try {
+                localStorage.setItem(stateKey(), JSON.stringify(state));
+            } catch (e) {
+                console.warn('State save failed (storage full):', e);
+            }
         }
 
         // ═══════════════════════════════════════════
@@ -474,6 +478,11 @@
             const CHECKLIST = getChecklist();
             let total = 0, checked = 0;
             CHECKLIST.forEach((section, sIdx) => { section.items.forEach((_, iIdx) => { total++; if (state.checked[`${sIdx}-${iIdx}`]) checked++; }); });
+            // Store photo counts only (not base64 data) to avoid localStorage quota issues
+            const photoCountsOnly = {};
+            Object.entries(state.issuePhotos).forEach(([key, photos]) => {
+                if (photos && photos.length > 0) photoCountsOnly[key] = photos.length;
+            });
             const record = {
                 date: new Date().toISOString(),
                 property: currentProperty,
@@ -482,13 +491,18 @@
                 completed: checked,
                 total: total,
                 issues: { ...state.issues },
-                issuePhotos: { ...state.issuePhotos },
+                issuePhotos: photoCountsOnly,
                 checkedItems: { ...state.checked }
             };
-            let history = JSON.parse(localStorage.getItem(historyKey()) || '[]');
-            history.unshift(record);
-            history = history.slice(0, 90);
-            localStorage.setItem(historyKey(), JSON.stringify(history));
+            try {
+                let history = JSON.parse(localStorage.getItem(historyKey()) || '[]');
+                history.unshift(record);
+                history = history.slice(0, 90);
+                localStorage.setItem(historyKey(), JSON.stringify(history));
+            } catch (e) {
+                alert('Save failed: storage is full. Try exporting and clearing old history.');
+                return;
+            }
             state.checked = {};
             state.issues = {};
             state.issuePhotos = {};
